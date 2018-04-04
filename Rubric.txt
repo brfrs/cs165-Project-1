@@ -1,0 +1,44 @@
+CompSci 165 Project #1 - Grading Rubrics
+
+ Correctness - 60 points
+  
+	5 - generates appropriate error messages for invalid input
+   15 - works for n=10 and k=3
+   40 - works for n=10000 and k=40
+  
+ Code structure - 5 points
+ Documentation - 10 points
+  
+   3 - analysis for theoretical WC
+   2 - analysis for theoretical expected WC
+   3 - analysis for theoretical AVG
+   2 - analysis for observed WC and AVG and explan inconsistencies
+  
+ Efficiency - 25 points based on Worst Case for (n,k) = (10000,40) in the following table:
+	 
+	Worst CasePoints
+		<	10490	30
+		<=	11000	25
+		<=	11200	24
+		<=	11400	23
+		<=	11600	22
+		<=	11800	21
+		<=	12000	20
+		<=	12200	19
+		<=	12400	18
+		<=	12600	17
+		<=	12800	16
+		<=	13000	15
+		<=	15000	12
+		<=	17500	10
+		<=	20000	8
+		<=	25000	6
+		<=	50000	5
+		<=	100000	4
+		<=	150000	3
+		<=	250000	2
+		>	250000	0
+	 
+
+
+
