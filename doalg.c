@@ -46,6 +46,11 @@ void quickSort(int* arr, int low, int high, int n, int k) {
 #if PARANOID
 		quickSort(arr, pi+1, high, n, k);
 		quickSort(arr, low, pi, n, k);
+		for (int i = low; i < high; i++) {
+			if (COMPARE(arr[i], arr[i+1]) == 1) {
+				printf("Left index: %d at %d, Right index: %d at %d\n", arr[i], i, arr[i+1], i+1);
+			}
+		}
 #else
 		if (high >= n-k) {
 			quickSort(arr, pi+1, high, n, k);
