@@ -25,10 +25,10 @@ int partition(int* arr, int lo, int hi) {
 	int h = pivot+1, k = hi;
 
 	while (h < k) {
-		while (h != k && COMPARE(arr[h], arr[pivot]) == 2) {
+		while (h != k && COMPARE(arr[h], arr[pivot]) == RIGHT_GREATER) {
 			h++;
 		}
-		while (h != k && COMPARE(arr[k], arr[pivot]) == 1) {
+		while (h != k && COMPARE(arr[k], arr[pivot]) == LEFT_GREATER) {
 			k--;
 		}
 		if (h < k) {
@@ -47,7 +47,7 @@ void quickSort(int* arr, int lo, int hi, int n, int k) {
 		quickSort(arr, pi+1, hi, n, k);
 		quickSort(arr, lo, pi, n, k);
 		for (int i = lo; i < hi; i++) {
-			if (COMPARE(arr[i], arr[i+1]) == 1) {
+			if (COMPARE(arr[i], arr[i+1]) == LEFT_GREATER) {
 				printf("lo: %d, hi: %d\n", lo, hi);
 				printf("h index: %d at %d, Right index: %d at %d\n", arr[i], i, arr[i+1], i+1);
 			}
