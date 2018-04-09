@@ -4,6 +4,7 @@
 double dshrandom( long );
 
 #include <stdarg.h>
+
 int COMPARE(int arg1, int arg2, ...) {
 /*  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  */
 /*	Comparisons to determine the biggest "k" array elements	*/
@@ -42,6 +43,10 @@ int COMPARE(int arg1, int arg2, ...) {
 				number[j] = t;
 			}
 		}
+#ifdef DEBUG
+		for (i=1; i<=arg2; ++i) printf("%d ", number[i]);
+		putchar('\n');
+#endif
 		comp = 0;
 		size = arg2;
 		return(0);
@@ -97,4 +102,8 @@ double dshrandom( long input ) {
 	else        seed = test+m;
 				/* seed equally in range 0...2^31 -1  */
 	return( ((double)seed)/(double)m );
+}
+
+void printArr() {
+	
 }
