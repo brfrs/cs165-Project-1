@@ -9,7 +9,6 @@
 
 #define SORT 1
 #define BINOMIAL 0
-#define BLANK 0
 
 #define PARANOID 1
 
@@ -328,20 +327,5 @@ int removeLargest(struct BinomialTree* t) {
 	t->head = newHead;
 
 	return result;
-}
-#endif
-
-#if BLANK
-int doalg(int n, int k, int* Best) {
-	int i;
-	struct BinomialTree tournament;
-
-	initBinomialTree(&tournament, n);
-
-	for (i = 0; i < k; ++i) {
-		Best[i] = removeLargest(&tournament);
-	}
-
-	return true;
 }
 #endif
