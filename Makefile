@@ -1,8 +1,9 @@
 CC=gcc
 PROJ_NAME=compare
+DEBUG=-g
 
 all: MAIN.c COMPARE.c doalg.c
-	$(CC) -g -o $(PROJ_NAME) $<
+	$(CC) $(DEBUG) -o $(PROJ_NAME) $<
 
 .PHONY: clean
 
