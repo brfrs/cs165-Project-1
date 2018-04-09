@@ -5,6 +5,14 @@
 #define LEFT_GREATER 1
 #define RIGHT_GREATER 2
 
+#define SORT 0
+#define BINOMIAL 1
+
+#if SORT
+#endif
+
+#if BINOMIAL
+
 #define ALLOC_LIST_NODE() (struct Node*)malloc(sizeof(struct Node))
 #define ALLOC_BINO_NODE() (struct BinomialTreeNode*)malloc(sizeof(struct BinomialTreeNode))
 
@@ -269,3 +277,4 @@ int doalg(int n, int k, int* Best) {
 
 	return true;
 }
+#endif
