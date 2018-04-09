@@ -20,43 +20,43 @@ void swap(int* arr, int index1, int index2) {
 	arr[index2] = temp;
 }
 
-int partition(int* arr, int low, int high) {
-	int partIndex = low;
-	int left = partIndex+1, right = high;
+int partition(int* arr, int lo, int hi) {
+	int pivot = lo;
+	int h = pivot+1, k = hi;
 
-	while (left < right) {
-		while (left != right && COMPARE(arr[left], arr[partIndex]) == 2) {
-			left++;
+	while (h < k) {
+		while (h != k && COMPARE(arr[h], arr[pivot]) == 2) {
+			h++;
 		}
-		while (left != right && COMPARE(arr[right], arr[partIndex]) == 1) {
-			right--;
+		while (h != k && COMPARE(arr[k], arr[pivot]) == 1) {
+			k--;
 		}
-		if (left < right) {
-			swap(arr, left, right);
-			left++;
+		if (h < k) {
+			swap(arr, h, k);
+			h++;
 		}
 	}
-	swap(arr, low, left-1);
-	return left-1;
+	swap(arr, lo, h-1);
+	return h-1;
 }
 
-void quickSort(int* arr, int low, int high, int n, int k) {
-	if (low < high) {
-		int pi = partition(arr, low, high);
+void quickSort(int* arr, int lo, int hi, int n, int k) {
+	if (lo < hi) {
+		int pi = partition(arr, lo, hi);
 #if PARANOID
-		quickSort(arr, pi+1, high, n, k);
-		quickSort(arr, low, pi, n, k);
-		for (int i = low; i < high; i++) {
+		quickSort(arr, pi+1, hi, n, k);
+		quickSort(arr, lo, pi, n, k);
+		for (int i = lo; i < hi; i++) {
 			if (COMPARE(arr[i], arr[i+1]) == 1) {
-				printf("Low: %d, High: %d\n", low, high);
-				printf("Left index: %d at %d, Right index: %d at %d\n", arr[i], i, arr[i+1], i+1);
+				printf("lo: %d, hi: %d\n", lo, hi);
+				printf("h index: %d at %d, Right index: %d at %d\n", arr[i], i, arr[i+1], i+1);
 			}
 		}
 #else
-		if (high >= n-k) {
-			quickSort(arr, pi+1, high, n, k);
+		if (hi >= n-k) {
+			quickSort(arr, pi+1, hi, n, k);
 			if (pi >= n - k) {
-				quickSort(arr, low, pi, n, k);
+				quickSort(arr, lo, pi, n, k);
 			}
 		}
 #endif
