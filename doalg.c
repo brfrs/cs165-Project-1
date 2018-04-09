@@ -33,7 +33,7 @@ int partition(int* arr, int low, int high) {
 		}
 		if (left < right) {
 			swap(arr, left, right);
-			//left++;
+			left++;
 		}
 	}
 	swap(arr, low, left-1);
@@ -48,6 +48,7 @@ void quickSort(int* arr, int low, int high, int n, int k) {
 		quickSort(arr, low, pi, n, k);
 		for (int i = low; i < high; i++) {
 			if (COMPARE(arr[i], arr[i+1]) == 1) {
+				printf("Low: %d, High: %d\n", low, high);
 				printf("Left index: %d at %d, Right index: %d at %d\n", arr[i], i, arr[i+1], i+1);
 			}
 		}
