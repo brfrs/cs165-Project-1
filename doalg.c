@@ -328,4 +328,18 @@ int removeLargest(struct BinomialTree* t) {
 
 	return result;
 }
+
+int doalg(int n, int k, int* Best) {
+	int i;
+	struct BinomialTree tournament;
+
+	initBinomialTree(&tournament, n);
+
+	for (i = 0; i < k; ++i) {
+		Best[i] = removeLargest(&tournament);
+	}
+
+	return true;
+}
+
 #endif
