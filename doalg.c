@@ -228,7 +228,7 @@ void printBinomialTreeNode(struct BinomialTreeNode node) {
 
 void initBinomialTree(struct BinomialTreeNode** t, int numOfIndices) {
 	int nodesLeft = numOfIndices;
-	int compResult, i;
+	int compResult;
 
 	struct Node* head;
 	struct Node* curr;
@@ -266,84 +266,7 @@ void initBinomialTree(struct BinomialTreeNode** t, int numOfIndices) {
 	head = NULL;
 }
 
-void mergeChildren(struct BinomialTreeNode* newHead, struct BinomialTreeNode* oldHead) {
-	struct Node* currNew = newHead->childNodes;
-	struct Node* currOld = oldHead->childNodes;
-	struct Node *left, *right;
-	int compResult;
-
-	while (currNew != NULL && currOld != NULL) {
-		compResult = COMPARE(GET_NODE_INDEX(currNew), GET_NODE_INDEX(currOld));
-		
-		left = currNew;
-		right = currOld;
-
-		currNew = currNew->next;
-		currOld = currOld->next;
-
-		if (compResult == LEFT_GREATER) {
-			transferNode(&oldHead->childNodes, right, &left->indexNode->childNodes);
-		} else if (compResult == RIGHT_GREATER) {
-			transferNode(&newHead->childNodes, left, &right->indexNode->childNodes);
-			transferNode(&oldHead->childNodes, right, &newHead->childNodes);
-		} else {
-			perror("PANIC!!!!\n");
-			exit(1);
-		}
-	}
-
-	while (currOld != NULL) {
-		left = currOld;
-		currOld = currOld->next;
-		transferNode(&oldHead->childNodes, left, &newHead->childNodes);
-	}
-}
-
 int removeLargest(struct BinomialTreeNode** t) {
-	/*
-	int compResult;
-	int result = (*t)->index;
-	
-	struct BinomialTreeNode* newHead;
-	struct BinomialTreeNode* oldHead;
-	struct Node* maxChild;
-	int maxChildIndex;
-
-	struct Node* curr;
-
-	if ((*t)->childNodes == NULL) {
-		return -1;
-	}
-
-	printList((*t)->childNodes);
-
-	maxChild = (*t)->childNodes;
-	maxChildIndex = GET_NODE_INDEX((*t)->childNodes);
-	curr = maxChild->next;
-
-	while (curr != NULL) {
-		compResult = COMPARE(maxChildIndex, GET_NODE_INDEX(curr));
-
-		if (compResult == RIGHT_GREATER) {
-			maxChild = curr;
-			maxChildIndex = GET_NODE_INDEX(curr);
-		}
-
-		curr = curr->next;
-	}
-
-	newHead = maxChild->indexNode;
-	deleteNode(&((*t)->childNodes), maxChild);
-
-	mergeChildren(newHead, *t);
-
-	oldHead = *t;
-	free(oldHead);
-
-	*t = newHead;
-
-	return result;
-	*/
 	int compResult;
 	int nodeCount = countElems((*t)->childNodes);
 	int result = (*t)->index;
