@@ -7,7 +7,7 @@
 #define LEFT_GREATER 1
 #define RIGHT_GREATER 2
 
-#define BINOMIAL 1
+#define MIN_HEAP 1
 
 #define PARANOID 0
 
@@ -356,6 +356,67 @@ int doalg(int n, int k, int* Best) {
 	}
 	putchar('\n');
 	freeBinoTreeNode(head);
+	return true;
+}
+
+#elif MIN_HEAP
+typedef struct _Min_Heap {
+	int* arr;
+	int numElements;
+} Min_Heap;
+
+Min_Heap* MIN_HEAP_ALLOC(int k) {
+	Min_Heap* ret = (Min_Heap*)malloc(sizeof(Min_Heap));
+	ret->arr = (int*)malloc(sizeof(int)*(k+1));
+	ret->arr[0] = k;
+	ret->numElements = k;
+	return ret;
+}
+
+void MIN_HEAP_FREE(Min_Heap* heap) {
+	free(heap->arr);
+	free(heap);
+}
+
+void MIN_HEAP_fill(Min_Heap* heap) {
+	for (int i = 1; i <= heap->arr[0]; i++) {
+		heap->arr[i] = i;
+	}
+}
+
+void MIN_HEAP_heapify(Min_Heap* heap) {
+	
+}
+
+void MIN_HEAP_insert(Min_Heap* heap, int num) {
+	if (COMPARE(heap[1], num) == RIGHT_GREATER) {
+		heap[1] = num;
+		MIN_HEAP_heapify(heap);
+	}
+}
+
+int MIN_HEAP_remove(Min_Heap* heap) {
+	ret = heap[1];
+	heap[1] = heap[numElements];
+	heap->numElements--;
+	MIN_HEAP_heapify(heap);
+	return ret;
+}
+
+int doalg(int n, int k, int* Best) {
+	Min_Heap* heap = MIN_HEAP_ALLOC(k);
+	MIN_HEAP_fill(heap);
+	MIN_HEAP_heapify(heap);
+
+	for (int i = k+1; i <= n; i++) {
+		MIN_HEAP_insert(heap, i);
+	}
+
+	for (int i = k-1; i >= 0; i--) {
+		Best[i] = MIN_HEAP_remove(heap);
+	}
+	
+	MIN_HEAP_FREE(heap);
 	return true;
 }
 
