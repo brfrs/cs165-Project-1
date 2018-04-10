@@ -7,12 +7,12 @@
 #define LEFT_GREATER 1
 #define RIGHT_GREATER 2
 
-#define SORT 0
 #define BINOMIAL 1
 
 #define PARANOID 0
 
-#if SORT
+#ifdef SORT
+
 void swap(int* arr, int index1, int index2) {
 	int temp = arr[index1];
 	arr[index1] = arr[index2];
@@ -77,9 +77,8 @@ int doalg(int n, int k, int* Best) {
 	}
 	return 1;
 }
-#endif
 
-#if BINOMIAL
+#elif BINOMIAL
 
 #define ALLOC_LIST_NODE() (struct Node*)malloc(sizeof(struct Node))
 #define ALLOC_BINO_NODE() (struct BinomialTreeNode*)malloc(sizeof(struct BinomialTreeNode))
