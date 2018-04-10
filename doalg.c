@@ -48,7 +48,7 @@ void quickSort(int* arr, int lo, int hi, int n, int k) {
 		for (int i = lo; i < hi; i++) {
 			if (COMPARE(arr[i], arr[i+1]) == LEFT_GREATER) {
 				printf("lo: %d, hi: %d\n", lo, hi);
-				printf("h index: %d at %d, Right index: %d at %d\n", arr[i], i, arr[i+1], i+1);
+				printf("h index: %d at %d, k index: %d at %d\n", arr[i], i, arr[i+1], i+1);
 			}
 		}
 #else
