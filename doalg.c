@@ -10,7 +10,7 @@
 #define SORT 1
 #define BINOMIAL 0
 
-#define PARANOID 1
+#define PARANOID 0
 
 #if SORT
 void swap(int* arr, int index1, int index2) {
@@ -23,19 +23,23 @@ int partition(int* arr, int lo, int hi) {
 	int pivot = lo;
 	int h = pivot+1, k = hi;
 
-	while (h < k) {
-		while (h < k && COMPARE(arr[h], arr[pivot]) == RIGHT_GREATER) {
-			h++;
+	if (h < k) {
+		while (h < k) {
+			while (h < k && (COMPARE(arr[h], arr[pivot]) == RIGHT_GREATER)) {
+				h++;
+			}
+			while (h <= k && (COMPARE(arr[k], arr[pivot]) == LEFT_GREATER)) {
+				k--;
+			}
+			if (h < k) {
+				swap(arr, h, k);
+			}
 		}
-		while (h <= k && COMPARE(arr[k], arr[pivot]) == LEFT_GREATER) {
-			k--;
-		}
-		if (h < k) {
-			swap(arr, h, k);
-			h++;
-		}
+		swap(arr, pivot, k);
+		return k;
+	} else if (COMPARE(arr[h], arr[pivot]) == RIGHT_GREATER) {
+		swap(arr, pivot, k);
 	}
-	swap(arr, pivot, k);
 	return k;
 }
 
@@ -54,8 +58,8 @@ void quickSort(int* arr, int lo, int hi, int n, int k) {
 #else
 		if (hi >= n-k) {
 			quickSort(arr, pi+1, hi, n, k);
-			if (pi >= n - k) {
-				quickSort(arr, lo, pi, n, k);
+			if (pi-1 >= n - k) {
+				quickSort(arr, lo, pi-1, n, k);
 			}
 		}
 #endif
