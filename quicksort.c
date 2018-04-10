@@ -18,8 +18,9 @@ bool COMPARE(int index1, int index2) {
     return (index1 > index2 ? 1 : 2);
 }
 void swap(int* index1, int* index2) {
-    static int swapcount = 0;
-    printf("swapcount: %d\n", ++swapcount);
+    //static int swapcount = 0;
+    printf("Swapping: %d and %d\n", *index1, *index2);
+    //printf("swapcount: %d\n", ++swapcount);
 	int temp = *index1;
 	*index1 = *index2;
 	*index2 = temp;
