@@ -79,6 +79,7 @@ int doalg(int n, int k, int* Best) {
 
 #define ALLOC_LIST_NODE() (struct Node*)malloc(sizeof(struct Node))
 #define ALLOC_BINO_NODE() (struct BinomialTreeNode*)malloc(sizeof(struct BinomialTreeNode))
+#define GET_NODE_INDEX(node) (node->indexNode->index)
 
 struct Node {
 	struct Node* next;
@@ -106,6 +107,24 @@ void pushBack(struct Node** head, struct Node* newNode) {
 	}
 }
 
+void printList(struct Node* head) {
+	struct Node* curr;
+	for (curr = head; curr != NULL; curr = curr->next) {
+		printf("%zu ", GET_NODE_INDEX(curr));
+	}
+	putchar('\n');
+}
+
+int countElems(struct Node* head) {
+	int count = 0;
+	struct Node* curr = head;
+	while (curr != NULL) {
+		++count;
+		curr = curr->next;
+	}
+	return count;
+}
+
 void removeNode(struct Node** head, struct Node* toDelete) {
 	struct Node* temp;
 
@@ -127,6 +146,11 @@ void removeNode(struct Node** head, struct Node* toDelete) {
 void deleteNode(struct Node** head, struct Node* toDelete) {
 	removeNode(head, toDelete);
 	free(toDelete);
+}
+
+void transferNode(struct Node** donorHead, struct Node* nodeToTransfer, struct Node** recipientHead) {
+	removeNode(donorHead, nodeToTransfer);
+	pushBack(recipientHead, nodeToTransfer);
 }
 
 void freeList(struct Node** head) {
@@ -190,7 +214,7 @@ void printBinomialTreeNode(struct BinomialTreeNode node) {
 
 	curr = node.childNodes;
 	for (curr = node.childNodes ; curr != NULL; curr = curr->next) {
-		printf("%zu ", curr->indexNode->index);
+		printf("%zu ", GET_NODE_INDEX(curr));
 	}
 	putchar('\n');
 
@@ -215,7 +239,7 @@ void initBinomialTree(struct BinomialTreeNode** t, int numOfIndices) {
 	while (nodesLeft > 1) {
 		curr = head;
 		while (curr != NULL && curr->next != NULL) {
-			compResult = COMPARE(curr->indexNode->index, curr->next->indexNode->index);
+			compResult = COMPARE(GET_NODE_INDEX(curr), GET_NODE_INDEX(curr->next));
 			
 			if (compResult == LEFT_GREATER) {
 				temp = curr->next;
@@ -227,8 +251,7 @@ void initBinomialTree(struct BinomialTreeNode** t, int numOfIndices) {
 				exit(1);
 			}
 
-			removeNode(&head, temp);
-			pushBack(&curr->indexNode->childNodes, temp);
+			transferNode(&head, temp, &curr->indexNode->childNodes);
 
 			curr = curr->next;
 			--nodesLeft;
@@ -247,7 +270,7 @@ void mergeChildren(struct BinomialTreeNode* newHead, struct BinomialTreeNode* ol
 	int compResult;
 
 	while (currNew != NULL && currOld != NULL) {
-		compResult = COMPARE(currNew->indexNode->index, currOld->indexNode->index);
+		compResult = COMPARE(GET_NODE_INDEX(currNew), GET_NODE_INDEX(currOld));
 		
 		left = currNew;
 		right = currOld;
@@ -256,13 +279,10 @@ void mergeChildren(struct BinomialTreeNode* newHead, struct BinomialTreeNode* ol
 		currOld = currOld->next;
 
 		if (compResult == LEFT_GREATER) {
-			removeNode(&oldHead->childNodes, right);
-			pushBack(&left->indexNode->childNodes, right);
+			transferNode(&oldHead->childNodes, right, &left->indexNode->childNodes);
 		} else if (compResult == RIGHT_GREATER) {
-			removeNode(&newHead->childNodes, left);
-			removeNode(&oldHead->childNodes, right);
-			pushBack(&right->indexNode->childNodes, left);
-			pushBack(&newHead->childNodes, right);
+			transferNode(&newHead->childNodes, left, &right->indexNode->childNodes);
+			transferNode(&oldHead->childNodes, right, &newHead->childNodes);
 		} else {
 			perror("PANIC!!!!\n");
 			exit(1);
@@ -272,8 +292,7 @@ void mergeChildren(struct BinomialTreeNode* newHead, struct BinomialTreeNode* ol
 	while (currOld != NULL) {
 		left = currOld;
 		currOld = currOld->next;
-		removeNode(&oldHead->childNodes, left);
-		pushBack(&newHead->childNodes, left);
+		transferNode(&oldHead->childNodes, left, &newHead->childNodes);
 	}
 }
 
@@ -288,27 +307,30 @@ int removeLargest(struct BinomialTreeNode** t) {
 	int maxChildIndex;
 
 	struct Node* curr;
-	
+
 	if ((*t)->childNodes == NULL) {
 		return -1;
 	}
+
+	printList((*t)->childNodes);
+
 	maxChild = (*t)->childNodes;
-	maxChildIndex = (*t)->childNodes->indexNode->index;
+	maxChildIndex = GET_NODE_INDEX((*t)->childNodes);
 	curr = maxChild->next;
 
 	while (curr != NULL) {
-		compResult = COMPARE(maxChildIndex, curr->indexNode->index);
+		compResult = COMPARE(maxChildIndex, GET_NODE_INDEX(curr));
 
 		if (compResult == RIGHT_GREATER) {
 			maxChild = curr;
-			maxChildIndex = curr->indexNode->index;
+			maxChildIndex = GET_NODE_INDEX(curr);
 		}
 
 		curr = curr->next;
 	}
 
 	newHead = maxChild->indexNode;
-	deleteNode(&((*t)->childNodes), maxChild); // sorry...
+	deleteNode(&((*t)->childNodes), maxChild);
 
 	mergeChildren(newHead, *t);
 
@@ -325,11 +347,11 @@ int doalg(int n, int k, int* Best) {
 	struct BinomialTreeNode* head;
 
 	initBinomialTree(&head, n);
-
+	putchar('\n');
 	for (i = 0; i < k; ++i) {
 		Best[i] = removeLargest(&head);
 	}
-
+	putchar('\n');
 	freeBinoTreeNode(head);
 	return true;
 }
