@@ -79,205 +79,155 @@ int doalg(int n, int k, int* Best) {
 
 #elif BINOMIAL
 
-#define ALLOC_LIST_NODE() (struct Node*)malloc(sizeof(struct Node))
-#define ALLOC_BINO_NODE() (struct BinomialTreeNode*)malloc(sizeof(struct BinomialTreeNode))
-#define GET_NODE_INDEX(node) (node->indexNode->index)
+#define GET_NODE_INDEX(node) (node->treeNode->index)
+
+struct List {
+	struct Node* first;
+	struct Node* last;
+	int count;
+};
 
 struct Node {
 	struct Node* next;
 	struct Node* prev;
-	struct BinomialTreeNode* indexNode;
+	struct BinomialTreeNode* treeNode;
 };
 
 struct BinomialTreeNode {
-	size_t index;
-	struct Node* childNodes;
+	int index;
+	struct List listOfChildren;
 };
 
-void pushBack(struct Node** head, struct Node* newNode) {
-	if (*head == NULL) {
-		*head = newNode;
-	} else {
-		struct Node* current = *head;
-		while (current->next != NULL) {
-			current = current->next;
-		}
-
-		current->next = newNode;
-		newNode->prev = current;
-	}
-
-	newNode->next = NULL;
+void initList(struct List* list) {
+	list->first = NULL;
+	list->last = NULL;
+	list->count = 0;
 }
 
-void printList(struct Node* head) {
+void pushBack(struct List* list, struct Node* newNode) {
+	if (list->first == NULL) {
+		list->first = newNode;
+	} else {
+		list->last->next = newNode;
+		newNode->prev = list->last;
+	}
+	list->last = newNode;
+	++list->count;
+}
+
+void removeNode(struct List* list, struct Node* toRemove) {
+	if (list->first == toRemove) {
+		list->first = list->first->next;
+		if (list->first != NULL)
+			list->first->prev = NULL;
+	} else if (list->last == toRemove) {
+		toRemove->prev->next = NULL;
+		list->last = toRemove->prev;
+	} else {
+		toRemove->prev->next = toRemove->next;
+		toRemove->next->prev = toRemove->prev;
+	}
+
+	toRemove->next = NULL;
+	toRemove->prev = NULL;
+	--list->count;
+}
+
+void deleteNode(struct List* list, struct Node* toDelete) {
+	removeNode(list, toDelete);
+	free(toDelete);
+}
+
+void freeList(struct List* list) {
+	while (list->first != NULL) {
+        deleteNode(list, list->first);
+	}
+}
+
+void transferNode(struct List* donorList, struct Node* nodeToTransfer, struct List* recipientList) {
+	removeNode(donorList, nodeToTransfer);
+	pushBack(recipientList, nodeToTransfer);
+}
+
+void moveList(struct List* donorList, struct List* recipientList) {
+	if (recipientList->first != NULL) {
+		freeList(recipientList);
+	}
+
+	recipientList->first = donorList->first;
+	recipientList->last = donorList->last;
+	recipientList->count = donorList->count;
+
+	donorList->first = NULL;
+	donorList->last = NULL;
+	donorList->count = 0;
+}
+
+void printList(struct List list) {
 	struct Node* curr;
-	for (curr = head; curr != NULL; curr = curr->next) {
-		printf("%zu ", GET_NODE_INDEX(curr));
+	for (curr = list.first; curr != NULL; curr = curr->next) {
+		printf("%5d ", GET_NODE_INDEX(curr));
 	}
 	putchar('\n');
 }
 
-int countElems(struct Node* head) {
-	int count = 0;
-	struct Node* curr = head;
-	while (curr != NULL) {
-		++count;
-		curr = curr->next;
-	}
-	return count;
-}
-
-void removeNode(struct Node** head, struct Node* toDelete) {
-	struct Node* temp;
-
-	if (*head == toDelete) {
-		*head = (*head)->next;
-		if (*head != NULL)
-			(*head)->prev = NULL;
-	} else if (toDelete->next == NULL) {
-		toDelete->prev->next = NULL;
-	} else {
-		toDelete->prev->next = toDelete->next;
-		toDelete->next->prev = toDelete->prev;
-	}
-
-	toDelete->next = NULL;
-	toDelete->prev = NULL;
-}
-
-void deleteNode(struct Node** head, struct Node* toDelete) {
-	removeNode(head, toDelete);
-	free(toDelete);
-}
-
-void transferNode(struct Node** donorHead, struct Node* nodeToTransfer, struct Node** recipientHead) {
-	removeNode(donorHead, nodeToTransfer);
-	pushBack(recipientHead, nodeToTransfer);
-}
-
-void freeList(struct Node** head) {
-	struct Node* current = NULL;
-
-	while (*head != NULL) {
-        deleteNode(head, *head);
-	}
-}
-
-void initBinoTreeNode(struct BinomialTreeNode* node, size_t newIndex) {
-	int i;
+void initBinoTreeNode(struct BinomialTreeNode* node, int newIndex) {
 	node->index = newIndex;
-	node->childNodes = NULL;
+	initList(&node->listOfChildren);
+}
+
+void initNode(struct Node* node, int i) {
+	node->treeNode = (struct BinomialTreeNode*)malloc(sizeof(struct BinomialTreeNode));
+	node->next = NULL;
+	node->prev = NULL;
+
+	initBinoTreeNode(node->treeNode, i);
 }
 
 void freeBinoTreeNode(struct BinomialTreeNode* node) {
 	struct Node* curr;
-	for (curr = node->childNodes; curr != NULL; curr = curr->next) {
-		freeBinoTreeNode(curr->indexNode);
+	for (curr = node->listOfChildren.first; curr != NULL; curr = curr->next) {
+		freeBinoTreeNode(curr->treeNode);
 	}
 
 	if (node != NULL) {
-		freeList(&node->childNodes);
+		freeList(&node->listOfChildren);
 	}
 	free(node);
 }
 
-bool initListOfIndices(struct Node** head, int num) {
-	size_t i;
+bool fillListWithIndices(struct List* list, int num) {
+	int i;
 	struct Node* current;
-	*head = ALLOC_LIST_NODE();
-	(*head)->indexNode = ALLOC_BINO_NODE();
-	(*head)->prev = NULL;
 
-	initBinoTreeNode((*head)->indexNode, 1);
-
-	current = *head;
-
-	for (i = 2; i <= num; ++i) {
-		current->next = ALLOC_LIST_NODE();
-		
-		if (current->next == NULL) {
-			return false;
-		}
-
-		current->next->prev = current;
-		current = current->next;
-		current->indexNode = ALLOC_BINO_NODE();
-		initBinoTreeNode(current->indexNode, i);
+	for (i = 1; i <= num; ++i) {
+		current = (struct Node*)malloc(sizeof(struct Node));
+		initNode(current, i);
+		pushBack(list, current);
 	}
-
-	current->next = NULL;
 	return true;
 }
 
 void printBinomialTreeNode(struct BinomialTreeNode node) {
-	int i;
 	struct Node* curr;
-	printf("%5zu: ", node.index);
 
-	curr = node.childNodes;
-	for (curr = node.childNodes ; curr != NULL; curr = curr->next) {
-		printf("%zu ", GET_NODE_INDEX(curr));
-	}
-	putchar('\n');
+	printf("%5d: ", node.index);
+	printList(node.listOfChildren);
 
-	for (curr = node.childNodes; curr != NULL; curr = curr->next) {
-		printBinomialTreeNode(*curr->indexNode);
+	for (curr = node.listOfChildren.first; curr != NULL; curr = curr->next) {
+		printBinomialTreeNode(*curr->treeNode);
 	}
 }
 
-void initBinomialTree(struct BinomialTreeNode** t, int numOfIndices) {
-	int nodesLeft = numOfIndices;
-	int compResult;
 
-	struct Node* head;
+void runTournament(struct List* list) {
 	struct Node* curr;
 	struct Node* temp;
-
-	if (!initListOfIndices(&head, numOfIndices)) {
-		perror("Could not allocate linked list.\n");
-		exit(1);
-	}
-
-	while (nodesLeft > 1) {
-		curr = head;
-		while (curr != NULL && curr->next != NULL) {
-			compResult = COMPARE(GET_NODE_INDEX(curr), GET_NODE_INDEX(curr->next));
-			
-			if (compResult == LEFT_GREATER) {
-				temp = curr->next;
-			} else if (compResult == RIGHT_GREATER) {
-				temp = curr;
-				curr = curr->next;
-			} else {
-				perror("ERROR WITH COMPARISONS!!!\n");
-				exit(1);
-			}
-
-			transferNode(&head, temp, &curr->indexNode->childNodes);
-
-			curr = curr->next;
-			--nodesLeft;
-		}
-	}
-
-	*t = head->indexNode;
-	free(head);
-	head = NULL;
-}
-
-int removeLargest(struct BinomialTreeNode** t) {
 	int compResult;
-	int nodeCount = countElems((*t)->childNodes);
-	int result = (*t)->index;
-	struct BinomialTreeNode* oldHead;
-	struct Node* oldHeadChildren = (*t)->childNodes;
-	struct Node* curr, *temp;
-	
-	oldHead = *t;
+	int nodesLeft = list->count;
 
-	while (nodeCount > 1) {
-		curr = oldHeadChildren;
+	while (list->count > 1) {
+		curr = list->first;
 
 		while (curr != NULL && curr->next != NULL) {
 			compResult = COMPARE(GET_NODE_INDEX(curr), GET_NODE_INDEX(curr->next));
@@ -292,14 +242,41 @@ int removeLargest(struct BinomialTreeNode** t) {
 				exit(1);
 			}
 
-			transferNode(&oldHeadChildren, temp, &curr->indexNode->childNodes);
-			--nodeCount;
+			transferNode(list, temp, &curr->treeNode->listOfChildren);
 			curr = curr->next;		
 		}
 	}
+}
 
-	*t = oldHeadChildren->indexNode;
-	free(oldHead);
+void createTournamentTree(struct BinomialTreeNode** t, int numOfIndices) {
+	struct List winners;
+	
+	initList(&winners);
+	fillListWithIndices(&winners, numOfIndices);
+	
+	runTournament(&winners);
+
+	*t = winners.first->treeNode;
+	freeList(&winners);
+}
+
+int removeLargest(struct BinomialTreeNode** t) {
+	struct BinomialTreeNode* oldRoot;
+	struct List winners;
+	int result = (*t)->index;
+
+	initList(&winners);
+	oldRoot = *t;
+
+	moveList(&oldRoot->listOfChildren, &winners);
+
+	runTournament(&winners);
+
+	*t = winners.first->treeNode;
+
+	freeList(&winners);
+	free(oldRoot);
+	
 	return result;
 }
 
@@ -307,7 +284,7 @@ int doalg(int n, int k, int* Best) {
 	int i;
 	struct BinomialTreeNode* head;
 
-	initBinomialTree(&head, n);
+	createTournamentTree(&head, n);
 
 	for (i = 0; i < k-1; ++i) {
 		Best[i] = removeLargest(&head);
