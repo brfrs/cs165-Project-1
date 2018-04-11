@@ -12,21 +12,28 @@
 #define VISUALIZE 1
 #define VISUALIZE_DEPTH 4
 
+#define CACHING
+
 #ifdef CACHING 
 
 #define REINDEX(x) (x-1)
 #define COMPARE_FUNCTION cachedComp
 
 static int cache[MAXN][MAXN];
-static int validCacheElem;
+static int validCacheElems;
 
 void zeroCache() {
 	int i, j;
-	for (i = 0; i < validCacheElem; i++) {
-		for (j = 0; j < validCacheElem; j++) {
+	for (i = 0; i < validCacheElems; i++) {
+		for (j = 0; j < validCacheElems; j++) {
 			cache[i][j] = 0;
 		}
 	}
+}
+
+void initCache(int n) {
+	validCacheElems = n;
+	zeroCache();
 }
 
 int cachedComp(int i, int j) {
