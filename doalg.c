@@ -9,8 +9,12 @@
 
 #define BATTLEHEAP 1
 #define PARANOID 0
-#define VISUALIZE 1
-#define VISUALIZE_DEPTH 4
+
+//Note Plz set Main.c ITERATIONS to 1 if #define VISUALIZE
+
+#ifdef VISUALIZE
+#define VISUALIZE_DEPTH 3
+#endif
 
 #define CACHING
 
