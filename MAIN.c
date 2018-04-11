@@ -26,6 +26,10 @@ main(){
 			n = N[round];
 			k = K[round];
 			COMPARE(0,n);
+
+#ifdef CACHING
+			initCache(n);
+#endif
 			flag = doalg( n, k, Best);
 			if (flag==0) {
 				printf(" *** flagged error at loop=%d\n",loop);
