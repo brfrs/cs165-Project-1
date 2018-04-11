@@ -9,6 +9,8 @@
 
 #define BATTLEHEAP 1
 #define PARANOID 0
+#define VISUALIZE 1
+#define VISUALIZE_DEPTH 4
 
 #ifdef CACHING 
 
@@ -216,6 +218,30 @@ void printList(struct List list) {
 	putchar('\n');
 }
 
+#ifdef VISUALIZE
+void visualizeDFS(FILE* outfile, struct BattleHeapNode* node, int remaining) {
+	if (remaining == 0)
+		return;
+	struct Node* curr = node->listOfChildren.first;
+	while (curr != NULL) {
+		fprintf(outfile, "%d->%d\n", node->index, curr->heapNode->index);
+		visualizeDFS(outfile, curr->heapNode, remaining-1);
+		curr = curr->next;
+	}
+}
+
+void visualize(struct BattleHeapNode* node, int n, int k) {
+	static char BUF[256];
+	sprintf(BUF, "%d-%d.dot", n ,k);
+	FILE* outfile = fopen(BUF, "w");
+	fprintf(outfile, "digraph G {\ngraph [ranksep=0];\n");
+	int remaining = VISUALIZE_DEPTH;
+	visualizeDFS(outfile, node, remaining);
+	fprintf(outfile, "}\n");
+	fclose(outfile);
+}
+#endif
+
 void initBattleHeapNode(struct BattleHeapNode* node, int newIndex) {
 	node->index = newIndex;
 	initList(&node->listOfChildren);
@@ -335,6 +361,9 @@ int doalg(int n, int k, int* Best) {
 	}
 
 	createTournamentHeap(&head, n);
+#ifdef VISUALIZE
+	visualize(head, n, k);
+#endif
 
 	for (i = 0; i < k-1; ++i) {
 		Best[i] = removeLargest(&head);
