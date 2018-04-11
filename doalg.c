@@ -77,9 +77,9 @@ int doalg(int n, int k, int* Best) {
 	return 1;
 }
 
-#elif BINOMIAL
+#elif BATTLEHEAP
 
-#define GET_NODE_INDEX(node) (node->treeNode->index)
+#define GET_NODE_INDEX(node) (node->heapNode->index)
 
 typedef struct _List {
 	struct Node* first;
@@ -90,13 +90,13 @@ typedef struct _List {
 typedef struct _Node {
 	struct Node* next;
 	struct Node* prev;
-	struct BinomialTreeNode* treeNode;
-} Node;
+	struct BattleHeapNode* heapNode;
+};
 
-typedef struct _BinomialTreeNode {
+typedef struct _BattleHeapNode {
 	int index;
 	struct List listOfChildren;
-} BinomialTreeNode;
+} BattleHeapNode;
 
 void initList(struct List* list) {
 	list->first = NULL;
@@ -171,23 +171,23 @@ void printList(struct List list) {
 	putchar('\n');
 }
 
-void initBinoTreeNode(struct BinomialTreeNode* node, int newIndex) {
+void initBattleHeapNode(struct BattleHeapNode* node, int newIndex) {
 	node->index = newIndex;
 	initList(&node->listOfChildren);
 }
 
 void initNode(struct Node* node, int i) {
-	node->treeNode = (struct BinomialTreeNode*)malloc(sizeof(struct BinomialTreeNode));
+	node->heapNode = (struct BattleHeapNode*)malloc(sizeof(struct BattleHeapNode));
 	node->next = NULL;
 	node->prev = NULL;
 
-	initBinoTreeNode(node->treeNode, i);
+	initBattleHeapNode(node->heapNode, i);
 }
 
-void freeBinoTreeNode(struct BinomialTreeNode* node) {
+void freeBattleHeapNode(struct BattleHeapNode* node) {
 	struct Node* curr;
 	for (curr = node->listOfChildren.first; curr != NULL; curr = curr->next) {
-		freeBinoTreeNode(curr->treeNode);
+		freeBattleHeapNode(curr->heapNode);
 	}
 
 	if (node != NULL) {
@@ -208,14 +208,14 @@ bool fillListWithIndices(struct List* list, int num) {
 	return true;
 }
 
-void printBinomialTreeNode(struct BinomialTreeNode node) {
+void printBinomialTreeNode(struct BattleHeapNode node) {
 	struct Node* curr;
 
 	printf("%5d: ", node.index);
 	printList(node.listOfChildren);
 
 	for (curr = node.listOfChildren.first; curr != NULL; curr = curr->next) {
-		printBinomialTreeNode(*curr->treeNode);
+		printBinomialTreeNode(*curr->heapNode);
 	}
 }
 
@@ -242,13 +242,13 @@ void runTournament(struct List* list) {
 				exit(1);
 			}
 
-			transferNode(list, temp, &curr->treeNode->listOfChildren);
+			transferNode(list, temp, &curr->heapNode->listOfChildren);
 			curr = curr->next;		
 		}
 	}
 }
 
-void createTournamentTree(struct BinomialTreeNode** t, int numOfIndices) {
+void createTournamentHeap(struct BattleHeapNode** t, int numOfIndices) {
 	struct List winners;
 	
 	initList(&winners);
@@ -256,12 +256,12 @@ void createTournamentTree(struct BinomialTreeNode** t, int numOfIndices) {
 	
 	runTournament(&winners);
 
-	*t = winners.first->treeNode;
+	*t = winners.first->heapNode;
 	freeList(&winners);
 }
 
-int removeLargest(struct BinomialTreeNode** t) {
-	struct BinomialTreeNode* oldRoot;
+int removeLargest(struct BattleHeapNode** t) {
+	struct BattleHeapNode* oldRoot;
 	struct List winners;
 	int result = (*t)->index;
 
@@ -272,7 +272,7 @@ int removeLargest(struct BinomialTreeNode** t) {
 
 	runTournament(&winners);
 
-	*t = winners.first->treeNode;
+	*t = winners.first->heapNode;
 
 	freeList(&winners);
 	free(oldRoot);
@@ -282,16 +282,21 @@ int removeLargest(struct BinomialTreeNode** t) {
 
 int doalg(int n, int k, int* Best) {
 	int i;
-	struct BinomialTreeNode* head;
+	struct BattleHeapNode* head;
 
-	createTournamentTree(&head, n);
+	if (n == 1) {
+		Best[0] = 1;
+		return 1;
+	}
+
+	createTournamentHeap(&head, n);
 
 	for (i = 0; i < k-1; ++i) {
 		Best[i] = removeLargest(&head);
 	}
 	Best[i] = head->index;
 
-	freeBinoTreeNode(head);
+	freeBattleHeapNode(head);
 	return true;
 }
 
