@@ -128,22 +128,22 @@ int doalg(int n, int k, int* Best) {
 
 #define GET_NODE_INDEX(node) (node->heapNode->index)
 
-typedef struct _BattleHeapNode {
-	int index;
-	List listOfChildren;
-} BattleHeapNode;
-
-typedef struct _Node {
-	Node* next;
-	Node* prev;
-	BattleHeapNode* heapNode;
-} Node;
-
-typedef struct _List {
-	Node* first;
-	Node* last;
+struct List {
+	struct Node* first;
+	struct Node* last;
 	int count;
-} List;
+};
+
+struct Node {
+	struct Node* next;
+	struct Node* prev;
+	struct BinomialTreeNode* treeNode;
+};
+
+struct BinomialTreeNode {
+	int index;
+	struct List listOfChildren;
+};
 
 
 void initList(List* list) {
