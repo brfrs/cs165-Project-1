@@ -7,7 +7,7 @@
 #define LEFT_GREATER 1
 #define RIGHT_GREATER 2
 
-#define BINOMIAL 1
+#define MIN_HEAP 1
 #define PARANOID 0
 
 #ifdef SORT
@@ -320,6 +320,8 @@ int doalg(int n, int k, int* Best) {
 
 #elif MIN_HEAP
 
+static int COUNTER;
+
 void swap(int* left, int* right) {
 	int temp = *left;
 	*left = *right;
@@ -352,6 +354,7 @@ void MIN_HEAP_heapify(Min_Heap* heap, int i) {
 			k = 2*j;
 		else {
 			k = (COMPARE(heap->arr[2*j], heap->arr[2*j+1]) == RIGHT_GREATER) ? 2*j : (2*j)+1;
+			COUNTER++;
 		} 
 
 		if (COMPARE(heap->arr[k], heap->arr[j]) == RIGHT_GREATER) {
@@ -360,6 +363,7 @@ void MIN_HEAP_heapify(Min_Heap* heap, int i) {
 		} else {
 			j = heap->numElements;
 		}
+		COUNTER++;
 	}
 }
 
@@ -377,6 +381,7 @@ void MIN_HEAP_insert(Min_Heap* heap, int num) {
 		heap->arr[1] = num;
 		MIN_HEAP_heapify(heap, 1);
 	}
+	COUNTER++;
 }
 
 int MIN_HEAP_remove(Min_Heap* heap) {
@@ -388,16 +393,20 @@ int MIN_HEAP_remove(Min_Heap* heap) {
 }
 
 int doalg(int n, int k, int* Best) {
+	COUNTER = 0;
 	Min_Heap* heap = MIN_HEAP_ALLOC(k);
 	MIN_HEAP_fill(heap);
+	printf("Comparisons at: %d\n", COUNTER);
 
 	for (int i = k+1; i <= n; i++) {
 		MIN_HEAP_insert(heap, i);
 	}
+	printf("Comparisons at: %d\n", COUNTER);
 
 	for (int i = k-1; i >= 0; i--) {
 		Best[i] = MIN_HEAP_remove(heap);
 	}
+	printf("Comparisons at: %d\n", COUNTER);
 
 	MIN_HEAP_FREE(heap);
 	return true;
