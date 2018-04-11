@@ -10,6 +10,53 @@
 #define MIN_HEAP 1
 #define PARANOID 0
 
+#define CACHING 0
+
+#ifdef CACHING 
+
+#define REINDEX(x) (x-1)
+#define COMPARE_FUNCTION cachedComp
+
+static int cache[MAXN][MAXN];
+static int validCacheElem;
+
+void zeroCache() {
+	int i, j;
+	for (i = 0; i < validCacheElem; i++) {
+		for (j = 0; j < validCacheElem; j++) {
+			cache[i][j] = 0;
+		}
+	}
+}
+
+int cachedComp(int i, int j) {
+	int compResult;
+	int less, greater;
+	if (cache[REINDEX(i)][REINDEX(j)] == 0) {
+		compResult = COMPARE(i, j);
+
+		if (compResult == LEFT_GREATER) {
+			less = j;
+			greater = i;
+		} else if (compResult == RIGHT_GREATER) {
+			less = i;
+			greater = j;
+		} else {
+			perror("ERROR WITH COMPARISONS");
+			exit(1);
+		}
+
+		cache[REINDEX(greater)][REINDEX(less)] = LEFT_GREATER;
+		cache[REINDEX(less)][REINDEX(greater)] = RIGHT_GREATER;
+	}
+
+	return cache[REINDEX(i)][REINDEX(j)];
+}
+
+#else
+#define COMPARE_FUNCTION COMPARE
+#endif
+
 #ifdef SORT
 
 void swap(int* arr, int index1, int index2) {
@@ -24,10 +71,10 @@ int partition(int* arr, int lo, int hi) {
 
 	if (h < k) {
 		while (h < k) {
-			while (h < k && (COMPARE(arr[h], arr[pivot]) == RIGHT_GREATER)) {
+			while (h < k && (COMPARE_FUNCTION(arr[h], arr[pivot]) == RIGHT_GREATER)) {
 				h++;
 			}
-			while (h <= k && (COMPARE(arr[k], arr[pivot]) == LEFT_GREATER)) {
+			while (h <= k && (COMPARE_FUNCTION(arr[k], arr[pivot]) == LEFT_GREATER)) {
 				k--;
 			}
 			if (h < k) {
@@ -36,7 +83,7 @@ int partition(int* arr, int lo, int hi) {
 		}
 		swap(arr, pivot, k);
 		return k;
-	} else if (COMPARE(arr[h], arr[pivot]) == RIGHT_GREATER) {
+	} else if (COMPARE_FUNCTION(arr[h], arr[pivot]) == RIGHT_GREATER) {
 		swap(arr, pivot, k);
 	}
 	return k;
@@ -49,7 +96,7 @@ void quickSort(int* arr, int lo, int hi, int n, int k) {
 		quickSort(arr, pi+1, hi, n, k);
 		quickSort(arr, lo, pi-1, n, k);
 		for (int i = lo; i < hi; i++) {
-			if (COMPARE(arr[i], arr[i+1]) == LEFT_GREATER) {
+			if (COMPARE_FUNCTION(arr[i], arr[i+1]) == LEFT_GREATER) {
 				printf("lo: %d, hi: %d, pi: %d\n", lo, hi, pi);
 				printf("h index: %d at %d, k index: %d at %d\n", arr[i], i, arr[i+1], i+1);
 			}
@@ -230,7 +277,7 @@ void runTournament(struct List* list) {
 		curr = list->first;
 
 		while (curr != NULL && curr->next != NULL) {
-			compResult = COMPARE(GET_NODE_INDEX(curr), GET_NODE_INDEX(curr->next));
+			compResult = COMPARE_FUNCTION(GET_NODE_INDEX(curr), GET_NODE_INDEX(curr->next));
 
 			if (compResult == LEFT_GREATER) {
 				temp = curr->next;
@@ -335,11 +382,11 @@ void MIN_HEAP_heapify(Min_Heap* heap, int i) {
 		if (2*j == heap->numElements)
 			k = 2*j;
 		else {
-			k = (COMPARE(heap->arr[2*j], heap->arr[2*j+1]) == RIGHT_GREATER) ? 2*j : (2*j)+1;
+			k = (COMPARE_FUNCTION(heap->arr[2*j], heap->arr[2*j+1]) == RIGHT_GREATER) ? 2*j : (2*j)+1;
 			COUNTER++;
 		} 
 
-		if (COMPARE(heap->arr[k], heap->arr[j]) == RIGHT_GREATER) {
+		if (COMPARE_FUNCTION(heap->arr[k], heap->arr[j]) == RIGHT_GREATER) {
 			swap(&heap->arr[k], &heap->arr[j]);
 			j = k;
 		} else {
@@ -359,7 +406,7 @@ void MIN_HEAP_fill(Min_Heap* heap) {
 }
 
 void MIN_HEAP_insert(Min_Heap* heap, int num) {
-	if (COMPARE(heap->arr[1], num) == RIGHT_GREATER) {
+	if (COMPARE_FUNCTION(heap->arr[1], num) == RIGHT_GREATER) {
 		heap->arr[1] = num;
 		MIN_HEAP_heapify(heap, 1);
 	}
