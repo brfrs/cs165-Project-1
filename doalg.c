@@ -7,7 +7,7 @@
 #define LEFT_GREATER 1
 #define RIGHT_GREATER 2
 
-#define MIN_HEAP 1
+#define BATTLEHEAP 1
 #define PARANOID 0
 
 #define CACHING 0
@@ -128,30 +128,31 @@ int doalg(int n, int k, int* Best) {
 
 #define GET_NODE_INDEX(node) (node->heapNode->index)
 
+typedef struct _BattleHeapNode {
+	int index;
+	List listOfChildren;
+} BattleHeapNode;
+
+typedef struct _Node {
+	Node* next;
+	Node* prev;
+	BattleHeapNode* heapNode;
+} Node;
+
 typedef struct _List {
-	struct Node* first;
-	struct Node* last;
+	Node* first;
+	Node* last;
 	int count;
 } List;
 
-typedef struct _Node {
-	struct Node* next;
-	struct Node* prev;
-	struct BattleHeapNode* heapNode;
-};
 
-typedef struct _BattleHeapNode {
-	int index;
-	struct List listOfChildren;
-} BattleHeapNode;
-
-void initList(struct List* list) {
+void initList(List* list) {
 	list->first = NULL;
 	list->last = NULL;
 	list->count = 0;
 }
 
-void pushBack(struct List* list, struct Node* newNode) {
+void pushBack(List* list, Node* newNode) {
 	if (list->first == NULL) {
 		list->first = newNode;
 	} else {
@@ -162,7 +163,7 @@ void pushBack(struct List* list, struct Node* newNode) {
 	++list->count;
 }
 
-void removeNode(struct List* list, struct Node* toRemove) {
+void removeNode(List* list, Node* toRemove) {
 	if (list->first == toRemove) {
 		list->first = list->first->next;
 		if (list->first != NULL)
@@ -180,23 +181,23 @@ void removeNode(struct List* list, struct Node* toRemove) {
 	--list->count;
 }
 
-void deleteNode(struct List* list, struct Node* toDelete) {
+void deleteNode(List* list, Node* toDelete) {
 	removeNode(list, toDelete);
 	free(toDelete);
 }
 
-void freeList(struct List* list) {
+void freeList(List* list) {
 	while (list->first != NULL) {
         deleteNode(list, list->first);
 	}
 }
 
-void transferNode(struct List* donorList, struct Node* nodeToTransfer, struct List* recipientList) {
+void transferNode(List* donorList, Node* nodeToTransfer, List* recipientList) {
 	removeNode(donorList, nodeToTransfer);
 	pushBack(recipientList, nodeToTransfer);
 }
 
-void moveList(struct List* donorList, struct List* recipientList) {
+void moveList(List* donorList, List* recipientList) {
 	if (recipientList->first != NULL) {
 		freeList(recipientList);
 	}
@@ -210,29 +211,29 @@ void moveList(struct List* donorList, struct List* recipientList) {
 	donorList->count = 0;
 }
 
-void printList(struct List list) {
-	struct Node* curr;
+void printList(List list) {
+	Node* curr;
 	for (curr = list.first; curr != NULL; curr = curr->next) {
 		printf("%5d ", GET_NODE_INDEX(curr));
 	}
 	putchar('\n');
 }
 
-void initBattleHeapNode(struct BattleHeapNode* node, int newIndex) {
+void initBattleHeapNode(BattleHeapNode* node, int newIndex) {
 	node->index = newIndex;
 	initList(&node->listOfChildren);
 }
 
-void initNode(struct Node* node, int i) {
-	node->heapNode = (struct BattleHeapNode*)malloc(sizeof(struct BattleHeapNode));
+void initNode(Node* node, int i) {
+	node->heapNode = (BattleHeapNode*)malloc(sizeof(BattleHeapNode));
 	node->next = NULL;
 	node->prev = NULL;
 
 	initBattleHeapNode(node->heapNode, i);
 }
 
-void freeBattleHeapNode(struct BattleHeapNode* node) {
-	struct Node* curr;
+void freeBattleHeapNode(BattleHeapNode* node) {
+	Node* curr;
 	for (curr = node->listOfChildren.first; curr != NULL; curr = curr->next) {
 		freeBattleHeapNode(curr->heapNode);
 	}
@@ -243,20 +244,37 @@ void freeBattleHeapNode(struct BattleHeapNode* node) {
 	free(node);
 }
 
-bool fillListWithIndices(struct List* list, int num) {
+bool fillListWithIndices(List* list, int num) {
 	int i;
-	struct Node* current;
+	Node* current;
 
 	for (i = 1; i <= num; ++i) {
-		current = (struct Node*)malloc(sizeof(struct Node));
+		current = (Node*)malloc(sizeof(Node));
 		initNode(current, i);
 		pushBack(list, current);
 	}
 	return true;
 }
 
-void printBinomialTreeNode(struct BattleHeapNode node) {
-	struct Node* curr;
+void visualize(BattleHeapNode node, int n, int k) {
+	static char BUF[256];
+	sprintf(BUF, "%d-%d.dot", n ,k);
+	FILE* outfile = fopen(BUF, "w");
+	fprintf(outfile, "digraph G {\ngraph [ranksep=0];\n");
+	int remaining = 0;
+	visualizeDFS(outfile, node);
+}
+
+void visualizeDFS(FILE* outfile, BattleHeapNode node) {
+	BattleHeapNode* curr;
+	while (curr != NULL) {
+		
+		//curr = curr->next;
+	}
+}
+
+void printBinomialTreeNode(BattleHeapNode node) {
+	Node* curr;
 
 	printf("%5d: ", node.index);
 	printList(node.listOfChildren);
@@ -267,9 +285,9 @@ void printBinomialTreeNode(struct BattleHeapNode node) {
 }
 
 
-void runTournament(struct List* list) {
-	struct Node* curr;
-	struct Node* temp;
+void runTournament(List* list) {
+	Node* curr;
+	Node* temp;
 	int compResult;
 	int nodesLeft = list->count;
 
@@ -295,8 +313,8 @@ void runTournament(struct List* list) {
 	}
 }
 
-void createTournamentHeap(struct BattleHeapNode** t, int numOfIndices) {
-	struct List winners;
+void createTournamentHeap(BattleHeapNode** t, int numOfIndices) {
+	List winners;
 	
 	initList(&winners);
 	fillListWithIndices(&winners, numOfIndices);
@@ -307,9 +325,9 @@ void createTournamentHeap(struct BattleHeapNode** t, int numOfIndices) {
 	freeList(&winners);
 }
 
-int removeLargest(struct BattleHeapNode** t) {
-	struct BattleHeapNode* oldRoot;
-	struct List winners;
+int removeLargest(BattleHeapNode** t) {
+	BattleHeapNode* oldRoot;
+	List winners;
 	int result = (*t)->index;
 
 	initList(&winners);
@@ -329,7 +347,7 @@ int removeLargest(struct BattleHeapNode** t) {
 
 int doalg(int n, int k, int* Best) {
 	int i;
-	struct BattleHeapNode* head;
+	BattleHeapNode* head;
 
 	if (n == 1) {
 		Best[0] = 1;
