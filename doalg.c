@@ -81,22 +81,22 @@ int doalg(int n, int k, int* Best) {
 
 #define GET_NODE_INDEX(node) (node->treeNode->index)
 
-struct List {
+typedef struct _List {
 	struct Node* first;
 	struct Node* last;
 	int count;
-};
+} List;
 
-struct Node {
+typedef struct _Node {
 	struct Node* next;
 	struct Node* prev;
 	struct BinomialTreeNode* treeNode;
-};
+} Node;
 
-struct BinomialTreeNode {
+typedef struct _BinomialTreeNode {
 	int index;
 	struct List listOfChildren;
-};
+} BinomialTreeNode;
 
 void initList(struct List* list) {
 	list->first = NULL;
