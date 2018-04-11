@@ -295,4 +295,89 @@ int doalg(int n, int k, int* Best) {
 	return true;
 }
 
+#elif MIN_HEAP
+
+void swap(int* left, int* right) {
+	int temp = *left;
+	*left = *right;
+	*right = temp;	
+}
+
+typedef struct _Min_Heap {
+	int* arr;
+	int numElements;
+} Min_Heap;
+
+Min_Heap* MIN_HEAP_ALLOC(int k) {
+	Min_Heap* ret = (Min_Heap*)malloc(sizeof(Min_Heap));
+	ret->arr = (int*)malloc(sizeof(int)*(k+1));
+	ret->arr[0] = k;
+	ret->numElements = k;
+	return ret;
+}
+
+void MIN_HEAP_FREE(Min_Heap* heap) {
+	free(heap->arr);
+	free(heap);
+}
+
+void MIN_HEAP_heapify(Min_Heap* heap, int i) {
+	int j = i;
+	int k;
+	while (j <= heap->numElements/2) {
+		if (2*j == heap->numElements)
+			k = 2*j;
+		else {
+			k = (COMPARE(heap->arr[2*j], heap->arr[2*j+1]) == RIGHT_GREATER) ? 2*j : (2*j)+1;
+		} 
+
+		if (COMPARE(heap->arr[k], heap->arr[j]) == RIGHT_GREATER) {
+			swap(&heap->arr[k], &heap->arr[j]);
+			j = k;
+		} else {
+			j = heap->numElements;
+		}
+	}
+}
+
+void MIN_HEAP_fill(Min_Heap* heap) {
+	for (int i = 1; i <= heap->numElements; i++) {
+		heap->arr[i] = i;
+	}
+	for (int i = heap->numElements/2; i > 0; i--) {
+		MIN_HEAP_heapify(heap, i);
+	}
+}
+
+void MIN_HEAP_insert(Min_Heap* heap, int num) {
+	if (COMPARE(heap->arr[1], num) == RIGHT_GREATER) {
+		heap->arr[1] = num;
+		MIN_HEAP_heapify(heap, 1);
+	}
+}
+
+int MIN_HEAP_remove(Min_Heap* heap) {
+	int ret = heap->arr[1];
+	heap->arr[1] = heap->arr[heap->numElements];
+	heap->numElements--;
+	MIN_HEAP_heapify(heap, 1);
+	return ret;
+}
+
+int doalg(int n, int k, int* Best) {
+	Min_Heap* heap = MIN_HEAP_ALLOC(k);
+	MIN_HEAP_fill(heap);
+
+	for (int i = k+1; i <= n; i++) {
+		MIN_HEAP_insert(heap, i);
+	}
+
+	for (int i = k-1; i >= 0; i--) {
+		Best[i] = MIN_HEAP_remove(heap);
+	}
+
+	MIN_HEAP_FREE(heap);
+	return true;
+}
+
 #endif
