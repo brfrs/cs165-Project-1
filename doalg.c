@@ -463,17 +463,14 @@ int doalg(int n, int k, int* Best) {
 	COUNTER = 0;
 	Min_Heap* heap = MIN_HEAP_ALLOC(k);
 	MIN_HEAP_fill(heap);
-	printf("Comparisons at: %d\n", COUNTER);
 
 	for (int i = k+1; i <= n; i++) {
 		MIN_HEAP_insert(heap, i);
 	}
-	printf("Comparisons at: %d\n", COUNTER);
 
 	for (int i = k-1; i >= 0; i--) {
 		Best[i] = MIN_HEAP_remove(heap);
 	}
-	printf("Comparisons at: %d\n", COUNTER);
 
 	MIN_HEAP_FREE(heap);
 	return true;
