@@ -7,7 +7,7 @@
 #include "doalg.c"
 
 #ifndef ITERATIONS
-#define ITERATIONS 1000
+#define ITERATIONS 1
 #endif
 
 main(){

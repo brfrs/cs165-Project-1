@@ -7,11 +7,11 @@
 #define LEFT_GREATER 1
 #define RIGHT_GREATER 2
 
-#define MIN_HEAP 1
+#define BATTLEHEAP 1
 #define PARANOID 0
 
 //Note Plz set Main.c ITERATIONS to 1 if #define VISUALIZE
-
+#define VISUALIZE
 #ifdef VISUALIZE
 #define VISUALIZE_DEPTH 3
 #endif
@@ -378,6 +378,9 @@ int doalg(int n, int k, int* Best) {
 
 	for (i = 0; i < k-1; ++i) {
 		Best[i] = removeLargest(&head);
+#ifdef VISUALIZE
+		visualize(head, n, k-i-1);
+#endif
 	}
 	Best[i] = head->index;
 
