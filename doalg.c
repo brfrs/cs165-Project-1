@@ -11,13 +11,12 @@
 #define PARANOID 0
 
 //Note Plz set Main.c ITERATIONS to 1 if #define VISUALIZE
-
+#define VISUALIZE
 #ifdef VISUALIZE
 #define VISUALIZE_DEPTH 3
 #endif
 
 #define CACHING
-
 #ifdef CACHING 
 
 #define REINDEX(x) (x-1)
@@ -373,11 +372,14 @@ int doalg(int n, int k, int* Best) {
 
 	createTournamentHeap(&head, n);
 #ifdef VISUALIZE
-	visualize(head, n, k);
+	//visualize(head, n, k);
 #endif
 
 	for (i = 0; i < k-1; ++i) {
 		Best[i] = removeLargest(&head);
+#ifdef VISUALIZE
+	visualize(head, n, k-i-1);
+#endif
 	}
 	Best[i] = head->index;
 
