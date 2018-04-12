@@ -7,7 +7,7 @@
 #define LEFT_GREATER 1
 #define RIGHT_GREATER 2
 
-#define BATTLEHEAP 1
+#define MIN_HEAP 1
 #define PARANOID 0
 
 //Note Plz set Main.c ITERATIONS to 1 if #define VISUALIZE
