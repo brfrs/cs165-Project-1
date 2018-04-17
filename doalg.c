@@ -147,7 +147,7 @@ void runTournament(struct List* list) {
 				curr = curr->next;
 			} else {
 				perror("ERROR WITH COMPARISONS!!!\n");
-				exit(1);
+				exit(EXIT_FAILURE);
 			}
 
 			transferNode(list, temp, &curr->heapNode->listOfChildren);
@@ -189,6 +189,14 @@ int removeLargest(struct BattleHeapNode** t) {
 }
 
 int doalg(int n, int k, int* Best) {
+	if (k > n) {
+		perror("Invalid input. k must be less than n.\n");
+		exit(EXIT_FAILURE);
+	}
+	if (n < 1) {
+		perror("Invalid input. n must be greater than 0.\n");
+		exit(EXIT_FAILURE);
+	}
 	int i;
 	struct BattleHeapNode* head;
 
