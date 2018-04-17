@@ -1,15 +1,25 @@
 Documentation:
-Our algorithm is split into two clear stages. In the first stage, a tournament is run
-to generate a nonbinary heap for the indices. This is expected to run in O(n) time.
-For a more precise number of comparisons, it is important how much n differers from a power of 2.
-Our current implementation gives byes to the last index during a round of the tournament with an odd
-number of competitors.
-Theoretical WC:
-In the theoretical worst case, there are ceil(lg(n)) rounds of the tournament with ceil(n/(2^round#))
-comparisons during a round.
+    Our algorithm is split into two clear stages. In the first stage, a tournament is run
+    to generate a nonbinary heap for the indices. This is expected to run in O(n) time.
+    For a more precise number of comparisons, it is important how much n differers from a power of 2.
+    Our current implementation gives byes to the last index during a round of the tournament with an odd
+    number of competitors. If the final round has one element, it is compared with the root.
+    In stage 2, k elements are removed from the heap. With the root removed, a tournament is run
+    among the children to reform the heap. 
 
+Theoretical WC:
+    Stage 1:
+    In the theoretical worst case, there are ceil(lg(n)) rounds of the tournament with ceil(n/(2^round#))
+    comparisons during a round. This worst case occurs when n is 2^x-1 for some positive integer x.
+    The worst case n + lgn comparisons. The best case is n comparisons.
+
+    Stage 2:
+    The worst case for our initial tournament results in ceil(lgn)-1 children of the root.
+    Thus each removal and merge trees event takes ceil(lgn)-1 + floor(lglg(n)) comparisons with n decreasing
+    by one each removal.
 
 Theoretical Expected WC:
+
 
 Theoretical AVG:
 
