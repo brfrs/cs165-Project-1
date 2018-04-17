@@ -4,14 +4,17 @@ Documentation:
     For a more precise number of comparisons, it is important how much n differers from a power of 2.
     Our current implementation gives byes to the last index during a round of the tournament with an odd
     number of competitors. If the final round has one element, it is compared with the root.
-    In stage 2, k elements are removed from the heap. With the root removed, a tournament is run
+    In stage 2, k elements are removed from the heap. When each root is removed, a tournament is run
     among the children to reform the heap. 
 
 Theoretical WC:
     Stage 1:
     In the theoretical worst case, there are ceil(lg(n)) rounds of the tournament with ceil(n/(2^round#))
-    comparisons during a round. This worst case occurs when n is 2^x-1 for some positive integer x.
-    The worst case n + lgn comparisons. The best case is n comparisons.
+    comparisons during a round. Analysis issues occur when there is an odd number of competitors in the round.
+    We theorize the worst case occurs when n=2^k - 1 for some positive integer k.
+    We theorize the exact number of comparisons is: Sum from i = 1 to ceil(lgn) of (floor(n/2^i) + floor(n/2^i)%2)
+    The second term accounts for odd competitors during rounds of the tournament.
+    
 
     Stage 2:
     The worst case for our initial tournament results in ceil(lgn)-1 children of the root.
@@ -19,8 +22,16 @@ Theoretical WC:
     by one each removal.
 
 Theoretical Expected WC:
-
+    Stage 1 of our algorithm always takes n comparisons when n is {100, 10000}.
+    Stage 2 takes takes lgn comparisons per root removal resulting in k*lgn comparisons.
 
 Theoretical AVG:
 
 Analysis for observed WC:
+    Results:
+    n=  100,  k=10:  maximum= 168,  avg=  158.14
+    n=10000,  k=40:  maximum= 10627,  avg=10592.06
+    Our worst cases match nearly exactly with n + klgn.
+    100 + 10lg(100) = 170
+    10000 + 40lg(10000) = 10520
+    
