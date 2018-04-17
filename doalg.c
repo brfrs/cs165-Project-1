@@ -1,7 +1,5 @@
 #include <stdbool.h>
-#include <stdlib.h>
 #include <stdio.h>
-#include <time.h>
 #include <stdlib.h>
 
 #define LEFT_GREATER 1
@@ -36,7 +34,9 @@ struct BattleHeapNode {
 	int index;
 	struct List listOfChildren;
 };
-
+/*
+ * Initializes a list struct with NULLs and 
+ */
 void initList(struct List* list) {
 	list->first = NULL;
 	list->last = NULL;
