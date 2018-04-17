@@ -9,6 +9,17 @@
 
 #define GET_NODE_INDEX(node) (node->heapNode->index)
 
+void* Malloc(size_t size) {
+	void* ptr = malloc(size);
+	
+	if (ptr == NULL) {
+		perror("ERROR: could not maslloc data\n");
+		exit(EXIT_FAILURE);
+	}
+
+	return ptr;
+}
+
 struct List {
 	struct Node* first;
 	struct Node* last;
@@ -97,7 +108,7 @@ void initBattleHeapNode(struct BattleHeapNode* node, int newIndex) {
 }
 
 void initNode(struct Node* node, int i) {
-	node->heapNode = (struct BattleHeapNode*)malloc(sizeof(struct BattleHeapNode));
+	node->heapNode = (struct BattleHeapNode*)Malloc(sizeof(struct BattleHeapNode));
 	node->next = NULL;
 	node->prev = NULL;
 
@@ -121,7 +132,7 @@ bool fillListWithIndices(struct List* list, int num) {
 	struct Node* current;
 
 	for (i = 1; i <= num; ++i) {
-		current = (struct Node*)malloc(sizeof(struct Node));
+		current = (struct Node*)Malloc(sizeof(struct Node));
 		initNode(current, i);
 		pushBack(list, current);
 	}
