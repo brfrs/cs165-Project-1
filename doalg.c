@@ -189,14 +189,20 @@ int removeLargest(struct BattleHeapNode** t) {
 }
 
 int doalg(int n, int k, int* Best) {
-	if (k > n) {
-		perror("Invalid input. k must be less than n.\n");
+	//Invalid input checking
+	if (k > n || k < 1) {
+		perror("Invalid input. k must be less than n and greater than 0.\n");
 		exit(EXIT_FAILURE);
 	}
 	if (n < 1) {
 		perror("Invalid input. n must be greater than 0.\n");
 		exit(EXIT_FAILURE);
 	}
+	if (Best == NULL) {
+		perror("Nullptr for Best.\n");
+		exit(EXIT_FAILURE);
+	}
+
 	int i;
 	struct BattleHeapNode* head;
 
