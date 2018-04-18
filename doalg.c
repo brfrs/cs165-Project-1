@@ -107,7 +107,7 @@ void initBattleHeapNode(struct BattleHeapNode* node, int newIndex) {
 	initList(&node->listOfChildren);
 }
 
-void initBattleHeapNode(struct Node* node, int i) {
+void initNode(struct Node* node, int i) {
 	node->heapNode = (struct BattleHeapNode*)Malloc(sizeof(struct BattleHeapNode));
 	node->next = NULL;
 	node->prev = NULL;
@@ -133,7 +133,7 @@ bool fillListWithIndices(struct List* list, int num) {
 
 	for (i = 1; i <= num; ++i) {
 		current = (struct Node*)Malloc(sizeof(struct Node));
-		initBattleHeapNode(current, i);
+		initNode(current, i);
 		pushBack(list, current);
 	}
 	return true;
@@ -167,7 +167,7 @@ void runTournament(struct List* list) {
 	}
 }
 
-void createBattleHeap(struct BattleHeapNode** t, int numOfIndices) {
+void createTournamentHeap(struct BattleHeapNode** t, int numOfIndices) {
 	struct List winners;
 	
 	initList(&winners);
@@ -222,7 +222,7 @@ int doalg(int n, int k, int* Best) {
 		return 1;
 	}
 
-	createBattleHeap(&head, n);
+	createTournamentHeap(&head, n);
 
 	for (i = 0; i < k-1; ++i) {
 		Best[i] = removeLargest(&head);
