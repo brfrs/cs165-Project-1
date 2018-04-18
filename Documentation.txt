@@ -1,11 +1,20 @@
 Documentation:
-    Our algorithm is split into two clear stages. In the first stage, a tournament is run
-    to generate a nonbinary max heap for the indices. This is expected to run in O(n) time.
-    For a more precise number of comparisons, the number of nonzero bits in the binary representation of the number is important.
-    Our current implementation gives byes to the last index during a round of the tournament with an odd
-    number of competitors. If the final round has one element, it is compared with the root.
-    In stage 2, k elements are removed from the heap. When each root is removed, a tournament is run
-    among the orphaned children to reform the heap. The final element removed does not need to have the heap reformed.
+    Our solution algorithm for this problem utilizes a non-binary heap (referred to as a battle heap in the code)
+    to keep track of the index of the largest unprocessed value in the private array. As such, our algorithm 
+    can be analysed in two stages: an initial heap building stage, and a max-element retrieval stage. 
+    
+    In the first stage, elements are iteratively paired up and compared against each other. Elements who win will 
+    live on to be compared against other surviving elements in the next round. Losing elements are removed from 
+    consideration, and, in the heap, become a child of the element that beat it. If there is an odd number of 
+    elements in a round, then the left-out element gets a bye this round. This tournament continues until there is 
+    a single node left standing, which becomes the root. This tournament builds the heap while takes exactly 
+    n - 1 comparisons.
+
+    The second stage, is about removing the largest element and then finding the next largest to take its place. When
+    a removal occurs, the root is removed from the heap, and a tournament, as described in the previous phase, 
+    is held on the children. The winner of this tournament becomes the new root. This phase happens in m - 1 
+    comparisons where m is the number of children the root had. This stage is performed k - 1 times, as the kth largest
+    element does not need to be removed from the heap.
 
 Theoretical WC:
     Stage 1:
@@ -43,9 +52,9 @@ Analysis for observed WC:
     Results:
     n=  100,  k=10:  maximum= 168,  avg=  158.14
     n=10000,  k=40:  maximum= 10627,  avg=10592.06
-    Our worst cases match nearly exactly with n + klgn.
+    Our worst cases match nearly exactly with n + k lg n.
     Theoretical:
     99 + 10lg(100) = 159
-    99999 + 40lg(10000) = 10519
+    9999 + 40lg(10000) = 10519
     We expected the cost of merging to increase slowly as more elements are removed from the heap.
     
