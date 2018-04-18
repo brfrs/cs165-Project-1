@@ -26,7 +26,9 @@ Theoretical Expected WC:
     Stage 2 takes takes lgn comparisons per root removal resulting in k*lgn comparisons.
 
 Theoretical AVG:
-
+    Stage 1 of our algorithm always takes the same number of comparisons. The resulting heap can vary wildly and this can effect
+    the number of comparisons significantly. For example, if there is an odd man out in the last round of the tournament, that index
+    has a 1/10000 chance of "winning" against the root. If he wins, it costs 0 comparisons to merge the tree.
 Analysis for observed WC:
     Results:
     n=  100,  k=10:  maximum= 168,  avg=  158.14
