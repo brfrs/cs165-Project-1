@@ -5,6 +5,9 @@
 #define LEFT_GREATER 1
 #define RIGHT_GREATER 2
 
+#define DOALG_ERR 0
+#define DOALG_SUCC 1
+
 #define GET_NODE_INDEX(node) (node->heapNode->index)
 
 /* Struct definitions */
@@ -230,15 +233,15 @@ int doalg(int n, int k, int* Best) {
 	//Invalid input checking
 	if (k > n || k < 1) {
 		perror("Invalid input. k must be less than n and greater than 0.\n");
-		exit(EXIT_FAILURE);
+		return DOALG_ERR;
 	}
 	if (n < 1) {
 		perror("Invalid input. n must be greater than 0.\n");
-		exit(EXIT_FAILURE);
+		return DOALG_ERR;
 	}
 	if (Best == NULL) {
 		perror("Nullptr for Best.\n");
-		exit(EXIT_FAILURE);
+		return DOALG_ERR;
 	}
 
 	int i;
@@ -246,7 +249,7 @@ int doalg(int n, int k, int* Best) {
 
 	if (n == 1) {
 		Best[0] = 1;
-		return 1;
+		return DOALG_SUCC;
 	}
 
 	createBattleHeap(&root, n);
@@ -257,5 +260,5 @@ int doalg(int n, int k, int* Best) {
 	Best[i] = root->index; // Do not need to for the k-th element.
 
 	freeBattleHeapNode(root);
-	return true;
+	return DOALG_SUCC;
 }
