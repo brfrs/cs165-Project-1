@@ -246,7 +246,7 @@ int doalg(int n, int k, int* Best) {
 		return 1;
 	}
 
-	createTournamentHeap(&root, n);
+	createBattleHeap(&root, n);
 
 	for (i = 0; i < k-1; ++i) {
 		Best[i] = removeLargest(&root);
