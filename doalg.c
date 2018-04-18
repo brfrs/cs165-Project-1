@@ -7,16 +7,7 @@
 
 #define GET_NODE_INDEX(node) (node->heapNode->index)
 
-void* Malloc(size_t size) {
-	void* ptr = malloc(size);
-	
-	if (ptr == NULL) {
-		perror("ERROR: could not maslloc data\n");
-		exit(EXIT_FAILURE);
-	}
-
-	return ptr;
-}
+/* Struct definitions */
 
 struct List {
 	struct Node* first;
@@ -34,9 +25,23 @@ struct BattleHeapNode {
 	int index;
 	struct List listOfChildren;
 };
+
 /*
- * Initializes a list struct with NULLs and 
+ * Wrapper function that kills the program if malloc fails.
  */
+void* Malloc(size_t size) {
+	void* ptr = malloc(size);
+	
+	if (ptr == NULL) {
+		perror("ERROR: could not maslloc data\n");
+		exit(EXIT_FAILURE);
+	}
+
+	return ptr;
+}
+
+/* Linked List Functions */
+
 void initList(struct List* list) {
 	list->first = NULL;
 	list->last = NULL;
@@ -102,6 +107,8 @@ void moveList(struct List* donorList, struct List* recipientList) {
 	donorList->count = 0;
 }
 
+/* Battle Heap Functions */
+
 void initBattleHeapNode(struct BattleHeapNode* node, int newIndex) {
 	node->index = newIndex;
 	initList(&node->listOfChildren);
@@ -127,6 +134,11 @@ void freeBattleHeapNode(struct BattleHeapNode* node) {
 	free(node);
 }
 
+/* doalg Helper Functions */
+
+/*
+ * Creates a linked list filled with all 1 to n index values.
+ */
 bool fillListWithIndices(struct List* list, int num) {
 	int i;
 	struct Node* current;
@@ -139,6 +151,11 @@ bool fillListWithIndices(struct List* list, int num) {
 	return true;
 }
 
+/*
+ * Runs a tournament on a list of indices. Losing indices are removed from the list and
+ * become children of the index value that beat them. Terminates when there
+ * is only one node (index of the largest value) in the list.
+ */
 void runTournament(struct List* list) {
 	struct Node* curr;
 	struct Node* temp;
@@ -167,7 +184,10 @@ void runTournament(struct List* list) {
 	}
 }
 
-void createTournamentHeap(struct BattleHeapNode** t, int numOfIndices) {
+/*
+ * Creates a battle heap for this given private array and sets the root to t.
+ */
+void createBattleHeap(struct BattleHeapNode** t, int numOfIndices) {
 	struct List winners;
 	
 	initList(&winners);
@@ -179,6 +199,10 @@ void createTournamentHeap(struct BattleHeapNode** t, int numOfIndices) {
 	freeList(&winners);
 }
 
+/*
+ * Removes the largest element in the battle heap. Then
+ * finds the next largest to be the root. 
+ */
 int removeLargest(struct BattleHeapNode** t) {
 	struct BattleHeapNode* oldRoot;
 	struct List winners;
@@ -215,20 +239,20 @@ int doalg(int n, int k, int* Best) {
 	}
 
 	int i;
-	struct BattleHeapNode* head;
+	struct BattleHeapNode* root;
 
 	if (n == 1) {
 		Best[0] = 1;
 		return 1;
 	}
 
-	createTournamentHeap(&head, n);
+	createTournamentHeap(&root, n);
 
 	for (i = 0; i < k-1; ++i) {
-		Best[i] = removeLargest(&head);
+		Best[i] = removeLargest(&root);
 	}
-	Best[i] = head->index;
+	Best[i] = root->index; // Do not need to for the k-th element.
 
-	freeBattleHeapNode(head);
+	freeBattleHeapNode(root);
 	return true;
 }
