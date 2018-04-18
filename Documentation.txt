@@ -1,20 +1,22 @@
 Documentation:
     Our algorithm is split into two clear stages. In the first stage, a tournament is run
-    to generate a nonbinary heap for the indices. This is expected to run in O(n) time.
-    For a more precise number of comparisons, it is important how much n differers from a power of 2.
+    to generate a nonbinary max heap for the indices. This is expected to run in O(n) time.
+    For a more precise number of comparisons, the number of nonzero bits in the binary representation of the number is important.
     Our current implementation gives byes to the last index during a round of the tournament with an odd
     number of competitors. If the final round has one element, it is compared with the root.
     In stage 2, k elements are removed from the heap. When each root is removed, a tournament is run
-    among the children to reform the heap. 
+    among the orphaned children to reform the heap. The final element removed does not need to have the heap reformed.
 
 Theoretical WC:
     Stage 1:
     In the theoretical worst case, there are ceil(lg(n)) rounds of the tournament with ceil(n/(2^round#))
     comparisons during a round. Analysis issues occur when there is an odd number of competitors in the round.
-    We theorize the worst case occurs when n=2^k - 1 for some positive integer k.
-    We theorize the exact number of comparisons is: Sum from i = 1 to ceil(lgn) of (floor(n/2^i) + floor(n/2^i)%2)
-    The second term accounts for odd competitors during rounds of the tournament.
+    We theorize the worst case occurs when n=2^k - 1 for some positive integer k. This results in a maximal number of odd 
+    competitors during the tournament. 
+    We theorize the exact number of comparisons is: Sum from i = 1 to ceil(lgn) of (floor(n/2^i) + floor(n/2^i)%2).
+    The intution behind this is as follows:
     
+    The second term accounts for odd competitors during rounds of the tournament.
 
     Stage 2:
     The worst case for our initial tournament results in ceil(lgn)-1 children of the root.
@@ -22,18 +24,28 @@ Theoretical WC:
     by one each removal.
 
 Theoretical Expected WC:
-    Stage 1 of our algorithm always takes n comparisons when n is {100, 10000}.
+    Stage 1 of our algorithm always takes n-1 comparisons when n is {100, 10000}.
     Stage 2 takes takes lgn comparisons per root removal resulting in k*lgn comparisons.
 
 Theoretical AVG:
-    Stage 1 of our algorithm always takes the same number of comparisons. The resulting heap can vary wildly and this can effect
-    the number of comparisons significantly. For example, if there is an odd man out in the last round of the tournament, that index
-    has a 1/10000 chance of "winning" against the root. If he wins, it costs 0 comparisons to merge the tree.
+    Stage 1 of our algorithm always takes the same number of comparisons for a given n. For any value of n, our summation results in n-1.
+    The resulting heap can vary and this risks affecting the number of comparisons.
+    For example, if there is an odd man out in the last round of the tournament, that index
+    has a 1/10000 chance of "winning" against the root. If he wins, it costs 0 comparisons to merge the tree after the first removal.
+    However, rare events like this do little to effect our average case.
+    On average, the number of children the root has is expected to stay around ceil(lg(n)).
+    When n=100, this is ~7 nodes. The cost of merging 7 trees into a heap in a tournament is 3 + 2 + 1 = 6 comparisons. With k=10, 10*6 = 60.
+    When n=10,000, this is ~14 nodes. The cost of merging 14 trees is 7 + 3 + 2 + 1 = 13. With k=40, 13*40 = 520.
+    Using this, our theoretical avg number of comparisons is  99 + 60 = 159 for n=100, k=10.
+    For k=10,000 n=40, our theoretical avg number of comparisons is 99,999 + 520 = 10519.
+
 Analysis for observed WC:
     Results:
     n=  100,  k=10:  maximum= 168,  avg=  158.14
     n=10000,  k=40:  maximum= 10627,  avg=10592.06
     Our worst cases match nearly exactly with n + klgn.
-    100 + 10lg(100) = 170
-    10000 + 40lg(10000) = 10520
+    Theoretical:
+    99 + 10lg(100) = 159
+    99999 + 40lg(10000) = 10519
+    We expected the cost of merging to increase slowly as more elements are removed from the heap.
     
