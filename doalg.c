@@ -26,6 +26,9 @@ struct BattleHeapNode {
 	struct List listOfChildren;
 };
 
+/* Misc. Prototypes */
+void initBattleHeapNode(struct BattleHeapNode*, int);
+
 /*
  * Wrapper function that kills the program if malloc fails.
  */
@@ -46,6 +49,14 @@ void initList(struct List* list) {
 	list->first = NULL;
 	list->last = NULL;
 	list->count = 0;
+}
+
+void initNode(struct Node* node, int i) {
+	node->heapNode = (struct BattleHeapNode*)Malloc(sizeof(struct BattleHeapNode));
+	node->next = NULL;
+	node->prev = NULL;
+
+	initBattleHeapNode(node->heapNode, i);
 }
 
 void pushBack(struct List* list, struct Node* newNode) {
@@ -112,14 +123,6 @@ void moveList(struct List* donorList, struct List* recipientList) {
 void initBattleHeapNode(struct BattleHeapNode* node, int newIndex) {
 	node->index = newIndex;
 	initList(&node->listOfChildren);
-}
-
-void initNode(struct Node* node, int i) {
-	node->heapNode = (struct BattleHeapNode*)Malloc(sizeof(struct BattleHeapNode));
-	node->next = NULL;
-	node->prev = NULL;
-
-	initBattleHeapNode(node->heapNode, i);
 }
 
 void freeBattleHeapNode(struct BattleHeapNode* node) {
