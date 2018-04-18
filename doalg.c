@@ -31,20 +31,8 @@ struct BattleHeapNode {
 
 /* Misc. Prototypes */
 void initBattleHeapNode(struct BattleHeapNode*, int);
-
-/*
- * Wrapper function that kills the program if malloc fails.
- */
-void* Malloc(size_t size) {
-	void* ptr = malloc(size);
-	
-	if (ptr == NULL) {
-		perror("ERROR: could not maslloc data\n");
-		exit(EXIT_FAILURE);
-	}
-
-	return ptr;
-}
+void freeList(struct List*);
+void freeBattleHeapNode(struct BattleHeapNode*);
 
 /* Linked List Functions */
 
@@ -54,12 +42,19 @@ void initList(struct List* list) {
 	list->count = 0;
 }
 
-void initNode(struct Node* node, int i) {
-	node->heapNode = (struct BattleHeapNode*)Malloc(sizeof(struct BattleHeapNode));
+bool initNode(struct Node* node, int i) {
+	node->heapNode = (struct BattleHeapNode*)malloc(sizeof(struct BattleHeapNode));
 	node->next = NULL;
 	node->prev = NULL;
+	
+	if (node->heapNode == NULL) {
+		perror("Allocation failed on battle heap node.\n");
+		return false;
+	}
 
 	initBattleHeapNode(node->heapNode, i);
+
+	return true;
 }
 
 void pushBack(struct List* list, struct Node* newNode) {
@@ -99,6 +94,15 @@ void deleteNode(struct List* list, struct Node* toDelete) {
 void freeList(struct List* list) {
 	while (list->first != NULL) {
         deleteNode(list, list->first);
+	}
+}
+
+void freeHeapNodesInList(struct List* list) {
+	struct Node* curr = list->first;
+	while (curr != NULL) {
+		freeBattleHeapNode(curr->heapNode);
+		curr->heapNode = NULL;
+		curr = curr->next;
 	}
 }
 
@@ -148,10 +152,24 @@ void freeBattleHeapNode(struct BattleHeapNode* node) {
 bool fillListWithIndices(struct List* list, int num) {
 	int i;
 	struct Node* current;
+	bool nodeAllocSuccess;
 
 	for (i = 1; i <= num; ++i) {
-		current = (struct Node*)Malloc(sizeof(struct Node));
-		initNode(current, i);
+		current = (struct Node*)malloc(sizeof(struct Node));
+
+		if (current == NULL) {
+			perror("Error allocating a list node.\n");
+			return false;
+		}
+
+		nodeAllocSuccess = initNode(current, i);
+
+		if (!nodeAllocSuccess) {
+			perror("Error initializing a list node.\n");
+			free (current);
+			return false;
+		}
+
 		pushBack(list, current);
 	}
 	return true;
@@ -193,16 +211,24 @@ void runTournament(struct List* list) {
 /*
  * Creates a battle heap for this given private array and sets the root to t.
  */
-void createBattleHeap(struct BattleHeapNode** t, int numOfIndices) {
+bool createBattleHeap(struct BattleHeapNode** t, int numOfIndices) {
 	struct List winners;
-	
+	bool listFilledSuccessfully;
+
 	initList(&winners);
-	fillListWithIndices(&winners, numOfIndices);
+	listFilledSuccessfully = fillListWithIndices(&winners, numOfIndices);
 	
+	if (!listFilledSuccessfully) {
+		freeHeapNodesInList(&winners);
+		freeList(&winners);
+		return false;
+	}
+
 	runTournament(&winners);
 
 	*t = winners.first->heapNode;
 	freeList(&winners);
+	return true;
 }
 
 /*
@@ -246,13 +272,18 @@ int doalg(int n, int k, int* Best) {
 
 	int i;
 	struct BattleHeapNode* root;
+	bool battleHeapCreatedSuccessfully;
 
 	if (n == 1) {
 		Best[0] = 1;
 		return DOALG_SUCC;
 	}
 
-	createBattleHeap(&root, n);
+	battleHeapCreatedSuccessfully = createBattleHeap(&root, n);
+
+	if (!battleHeapCreatedSuccessfully) {
+		return DOALG_ERR;
+	}
 
 	for (i = 0; i < k-1; ++i) {
 		Best[i] = removeLargest(&root);
